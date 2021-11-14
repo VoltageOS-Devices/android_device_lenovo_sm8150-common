@@ -10,3 +10,7 @@ allow platform_app hal_dms_hwservice:hwservice_manager find;
 allow platform_app hal_dms_default:binder { call transfer };
 
 get_prop(platform_app, vendor_display_notch_prop);
+
+# Allow systemui to read vendor_sysfs_graphics
+allow platform_app vendor_sysfs_graphics:dir search;
+allow platform_app vendor_sysfs_graphics:file r_file_perms;

@@ -12,3 +12,7 @@ allow init hal_audio_default:binder call;
 # Allow init to write to sysfs_battery_supply
 allow init sysfs_battery_supply:file setattr;
 allow init vendor_sysfs_battery_supply:file setattr;
+
+# Allow init to read and write to vendor_sysfs_graphics
+allow init vendor_sysfs_graphics:dir search;
+allow init vendor_sysfs_graphics:file rw_file_perms;
