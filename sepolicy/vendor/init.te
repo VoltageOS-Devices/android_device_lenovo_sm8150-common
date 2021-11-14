@@ -7,3 +7,7 @@ allow init vendor_configs_file:dir mounton;
 allow init vendor_hal_dpmqmi_hwservice:hwservice_manager find;
 
 allow init sysfs:file setattr;
+
+# Allow init to read and write to vendor_sysfs_graphics
+allow init vendor_sysfs_graphics:dir search;
+allow init vendor_sysfs_graphics:file rw_file_perms;
