@@ -72,7 +72,9 @@ PRODUCT_COPY_FILES += \
     frameworks/native/data/etc/android.hardware.wifi.aware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.aware.xml \
     frameworks/native/data/etc/android.hardware.wifi.rtt.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.hardware.wifi.rtt.xml \
     frameworks/native/data/etc/android.software.ipsec_tunnels.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.ipsec_tunnels.xml \
-    frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml
+    frameworks/native/data/etc/handheld_core_hardware.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/handheld_core_hardware.xml \
+    frameworks/native/data/etc/android.software.opengles.deqp.level-2020-03-01.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.opengles.deqp.level.xml \
+    frameworks/native/data/etc/android.software.vulkan.deqp.level-2020-03-01.xml:$(TARGET_COPY_OUT_VENDOR)/etc/permissions/android.software.vulkan.deqp.level.xml
 
 # AID/fs configs
 PRODUCT_PACKAGES += \
@@ -140,10 +142,13 @@ PRODUCT_PACKAGES += \
     android.frameworks.displayservice@1.0 \
     libdng_sdk \
     libgui_vendor \
-    libxml2
+    libxml2 \
+    GCamGo
 
 PRODUCT_COPY_FILES += \
-    prebuilts/vndk/v29/arm64/arch-arm64-armv8-a/shared/vndk-sp/libc++.so:$(TARGET_COPY_OUT_VENDOR)/lib64/libc++.so
+    prebuilts/vndk/v29/arm64/arch-arm64-armv8-a/shared/vndk-sp/libc++.so:$(TARGET_COPY_OUT_VENDOR)/lib64/libc++.so \
+    $(LOCAL_PATH)/GCamGo/system/etc/permissions/com.google.android.GCamGo.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/permissions/com.google.android.GCamGo.xml \
+    $(LOCAL_PATH)/GCamGo/system/etc/configs/hiddenapi-package-whitelist-GCamGo.xml:$(TARGET_COPY_OUT_SYSTEM)/etc/sysconfig/hiddenapi-package-whitelist-GCamGo.xml
 
 # Component overrides
 PRODUCT_COPY_FILES += \
@@ -207,9 +212,29 @@ PRODUCT_PACKAGES += \
     vendor.qti.hardware.display.mapper@3.0.vendor \
     vendor.qti.hardware.display.mapper@4.0.vendor
 
+# Enable backpressure for GL comp
+PRODUCT_PROPERTY_OVERRIDES += \
+    debug.sf.enable_gl_backpressure=1
+
+# Enable app/sf phase offset as durations. The numbers below are translated from the existing
+# positive offsets by finding the duration app/sf will have with the offsets.
+# For SF the previous value was 6ms which under 16.6ms vsync time (60Hz) will leave SF with ~10.5ms
+# for each frame. For App the previous value was 2ms which under 16.6ms vsync time will leave the
+# App with ~20.5ms (16.6ms * 2 - 10.5ms - 2ms). The other values were calculated similarly.
+# Full comparison between the old vs. the new values are captured in
+# https://docs.google.com/spreadsheets/d/1a_5cVNY3LUAkeg-yL56rYQNwved6Hy-dvEcKSxp6f8k/edit
+
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += debug.sf.use_phase_offsets_as_durations=1
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += debug.sf.late.sf.duration=10500000
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += debug.sf.late.app.duration=20500000
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += debug.sf.early.sf.duration=16000000
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += debug.sf.early.app.duration=16500000
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += debug.sf.earlyGl.sf.duration=13500000
+PRODUCT_DEFAULT_PROPERTY_OVERRIDES += debug.sf.earlyGl.app.duration=21000000
+
 # DRM
 PRODUCT_PACKAGES += \
-    android.hardware.drm@1.3-service.clearkey
+    android.hardware.drm@1.4-service.clearkey
 
 # Fingerprint
 PRODUCT_PACKAGES += \
@@ -335,10 +360,10 @@ PRODUCT_PACKAGES += \
     rcs_service_aidl.xml \
     rcs_service_api \
     rcs_service_api.xml
-
-# RenderScript
+    
+# Remove unwanted packages
 PRODUCT_PACKAGES += \
-    android.hardware.renderscript@1.0-impl
+    RemovePackages
 
 # RIL
 PRODUCT_PACKAGES += \
