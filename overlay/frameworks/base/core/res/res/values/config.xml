@@ -774,4 +774,7 @@
 
     <!-- Should the pinner service pin the Home application? -->
     <bool name="config_pinnerHomeApp">true</bool>
+    
+    <!-- Night Light FOD -->
+    <bool name="disable_fod_night_light">true</bool>
 </resources>
